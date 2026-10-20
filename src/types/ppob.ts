@@ -1,4 +1,5 @@
 export type UserRole = 
+  | 'PELANGGAN'
   | 'PETUGAS_PPOB' 
   | 'KEUANGAN_DISTRIBUSI' 
   | 'SUPERVISOR' 

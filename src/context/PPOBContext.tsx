@@ -35,7 +35,8 @@ export type PageId =
   | 'jurnal'
   | 'workflow'
   | 'erd'
-  | 'audit';
+  | 'audit'
+  | 'portal_pelanggan';
 
 interface PPOBContextType {
   currentRole: UserRole;
@@ -46,6 +47,8 @@ interface PPOBContextType {
   setSelectedTrxId: (id: string) => void;
   selectedKasusId: string;
   setSelectedKasusId: (id: string) => void;
+  selectedPelangganId: string;
+  setSelectedPelangganId: (id: string) => void;
   
   // Data
   banks: Bank[];
@@ -81,10 +84,20 @@ const PPOBContext = createContext<PPOBContextType | undefined>(undefined);
 const STORAGE_KEY = 'sia_ppob_pln_state_v1';
 
 export const PPOBProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [currentRole, setCurrentRole] = useState<UserRole>('KEUANGAN_DISTRIBUSI');
+  const [currentRole, setCurrentRoleState] = useState<UserRole>('KEUANGAN_DISTRIBUSI');
   const [activePage, setActivePage] = useState<PageId>('dashboard');
   const [selectedTrxId, setSelectedTrxId] = useState<string>('TRX-003');
   const [selectedKasusId, setSelectedKasusId] = useState<string>('KAS-001');
+  const [selectedPelangganId, setSelectedPelangganId] = useState<string>('PEL-003');
+
+  const setCurrentRole = (role: UserRole) => {
+    setCurrentRoleState(role);
+    if (role === 'PELANGGAN') {
+      setActivePage('portal_pelanggan');
+    } else if (activePage === 'portal_pelanggan') {
+      setActivePage('dashboard');
+    }
+  };
 
   // Core state collections
   const [banks] = useState<Bank[]>(INITIAL_BANKS);
@@ -622,6 +635,8 @@ export const PPOBProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setSelectedTrxId,
         selectedKasusId,
         setSelectedKasusId,
+        selectedPelangganId,
+        setSelectedPelangganId,
         banks,
         pelangganList,
         tagihanList,

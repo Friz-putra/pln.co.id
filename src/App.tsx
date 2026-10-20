@@ -12,9 +12,10 @@ import { JurnalLaporanView } from './components/pages/JurnalLaporanView';
 import { WorkflowView } from './components/pages/WorkflowView';
 import { ErdView } from './components/pages/ErdView';
 import { AuditLogView } from './components/pages/AuditLogView';
+import { PelangganPortalView } from './components/pages/PelangganPortalView';
 
 const MainLayout: React.FC = () => {
-  const { activePage } = usePPOB();
+  const { activePage, currentRole } = usePPOB();
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   return (
@@ -27,7 +28,10 @@ const MainLayout: React.FC = () => {
         <Header onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
         
         <main className="flex-1 p-6 lg:p-8">
-          {activePage === 'dashboard' && <DashboardView />}
+          {(activePage === 'portal_pelanggan' || (currentRole === 'PELANGGAN' && activePage === 'dashboard')) && (
+            <PelangganPortalView />
+          )}
+          {activePage === 'dashboard' && currentRole !== 'PELANGGAN' && <DashboardView />}
           {activePage === 'pembayaran' && <PembayaranView />}
           {activePage === 'bukti' && <StatusBuktiView />}
           {activePage === 'settlement' && <SettlementView />}

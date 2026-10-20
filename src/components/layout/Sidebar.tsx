@@ -7,11 +7,11 @@ import {
   RefreshCw, 
   ShieldAlert, 
   BookOpen, 
-  GitMerge, 
-  Database, 
   ShieldCheck,
   Search,
-  CheckCircle2
+  Zap,
+  Clock,
+  UserCheck
 } from 'lucide-react';
 import { usePPOB, PageId } from '../../context/PPOBContext';
 
@@ -23,11 +23,12 @@ interface NavItem {
 }
 
 export const Sidebar: React.FC = () => {
-  const { activePage, setActivePage, kasusSelisihList } = usePPOB();
+  const { activePage, setActivePage, kasusSelisihList, currentRole } = usePPOB();
   const [searchQuery, setSearchQuery] = useState('');
 
   const openKasusCount = kasusSelisihList.filter(k => k.status !== 'SELESAI').length;
 
+  // Navigation for Staff roles
   const commandNavs: NavItem[] = [
     { id: 'dashboard', label: 'Dashboard Overview', icon: LayoutGrid },
     { id: 'bukti', label: 'Status transaksi', icon: FileText },
@@ -47,9 +48,17 @@ export const Sidebar: React.FC = () => {
 
   const akuntansiNavs: NavItem[] = [
     { id: 'jurnal', label: 'Jurnal dan laporan', icon: BookOpen },
-    { id: 'workflow', label: 'Alur proses (W01-W11)', icon: GitMerge },
-    { id: 'erd', label: 'Arsitektur ERD (18 Tabel)', icon: Database },
-    { id: 'audit', label: 'Jejak audit log', icon: ShieldCheck },
+    { id: 'audit', label: 'Audit log', icon: ShieldCheck },
+  ];
+
+  // Navigation for Customer role (PELANGGAN)
+  const pelangganCommandNavs: NavItem[] = [
+    { id: 'portal_pelanggan', label: 'Portal Pelanggan', icon: LayoutGrid },
+    { id: 'bukti', label: 'Struk & Bukti Resmi', icon: FileText },
+  ];
+
+  const pelangganLayananNavs: NavItem[] = [
+    { id: 'pembayaran', label: 'Bayar Tagihan PPOB', icon: CreditCard },
   ];
 
   const renderNavGroup = (title: string, items: NavItem[]) => (
@@ -100,7 +109,7 @@ export const Sidebar: React.FC = () => {
               PPOB PLN
             </h1>
             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
-              PENERIMAAN KAS
+              {currentRole === 'PELANGGAN' ? 'PORTAL PELANGGAN' : 'PENERIMAAN KAS'}
             </p>
           </div>
         </div>
@@ -123,20 +132,38 @@ export const Sidebar: React.FC = () => {
         </div>
       </div>
 
-      {/* Nav groups */}
+      {/* Nav groups based on active role */}
       <div className="flex-1 px-3 py-3 space-y-6 overflow-y-auto">
-        {renderNavGroup('COMMAND', commandNavs)}
-        {renderNavGroup('PENERIMAAN KAS', penerimaanNavs)}
-        {renderNavGroup('AKUNTANSI', akuntansiNavs)}
+        {currentRole === 'PELANGGAN' ? (
+          <>
+            {renderNavGroup('MENU PELANGGAN', pelangganCommandNavs)}
+            {renderNavGroup('LAYANAN MANDIRI', pelangganLayananNavs)}
+            <div className="p-3 bg-amber-50/70 rounded-xl border border-amber-200/60 text-xs text-amber-900 space-y-1">
+              <div className="font-bold flex items-center gap-1.5 text-amber-800">
+                <Zap className="w-3.5 h-3.5 text-amber-600" />
+                <span>PLN 123 Siap Melayani</span>
+              </div>
+              <p className="text-[11px] text-amber-700/80 leading-relaxed">
+                Layanan informasi gangguan, pengaduan kWh meter, dan pasang baru 24 jam.
+              </p>
+            </div>
+          </>
+        ) : (
+          <>
+            {renderNavGroup('COMMAND', commandNavs)}
+            {renderNavGroup('PENERIMAAN KAS', penerimaanNavs)}
+            {renderNavGroup('AKUNTANSI', akuntansiNavs)}
+          </>
+        )}
       </div>
 
-      {/* Bottom Footer: Workspace */}
+      {/* Bottom Footer */}
       <div className="p-4 border-t border-slate-100">
         <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">
           WORKSPACE
         </div>
         <div className="text-xs font-semibold text-slate-600">
-          Simulasi akademis MTSIA
+          {currentRole === 'PELANGGAN' ? 'Portal Mandiri Pelanggan' : 'Simulasi akademis MTSIA'}
         </div>
       </div>
     </aside>

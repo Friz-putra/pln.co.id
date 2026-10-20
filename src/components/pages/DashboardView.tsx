@@ -7,7 +7,13 @@ import {
   ArrowRight,
   Plus, 
   Landmark, 
-  BookOpen
+  BookOpen,
+  ShieldCheck,
+  CheckCircle2,
+  FileCheck,
+  CreditCard,
+  UserCheck,
+  Search
 } from 'lucide-react';
 import { usePPOB } from '../../context/PPOBContext';
 import { formatRupiah } from '../../utils/formatters';
@@ -18,10 +24,16 @@ export const DashboardView: React.FC = () => {
     mutasiBankList, 
     rekonsiliasiList, 
     kasusSelisihList, 
-    setActivePage 
+    currentRole,
+    setActivePage,
+    setSelectedKasusId,
+    approveInvestigation,
+    jurnalList,
+    postJournals
   } = usePPOB();
 
   const [activeTab, setActiveTab] = useState<'pembayaran' | 'settlement' | 'rekonsiliasi' | 'jurnal'>('pembayaran');
+  const [quickNotice, setQuickNotice] = useState<string | null>(null);
 
   // Dynamic calculations
   const totalPembayaran = pembayaranList
@@ -50,17 +62,133 @@ export const DashboardView: React.FC = () => {
   const pctDanaReceipt = Math.min(100, Math.round((totalDanaReceipt / maxBarValue) * 100));
   const pctHasilCocok = Math.min(100, Math.round((totalHasilCocok / maxBarValue) * 100));
 
+  const pendingApprovals = kasusSelisihList.filter(k => k.status === 'DIAJUKAN');
+  const readyJournals = jurnalList.filter(j => j.status === 'DRAF');
+
+  const handleQuickApprove = (kasusId: string) => {
+    const res = approveInvestigation(kasusId, true, 'Disetujui cepat melalui Dashboard Supervisor.');
+    setQuickNotice(res.message);
+    setTimeout(() => setQuickNotice(null), 4000);
+  };
+
+  const handleQuickPostJournals = () => {
+    const ids = readyJournals.map(j => j.jurnal_id);
+    const res = postJournals(ids);
+    if (res.success) {
+      setQuickNotice(`Berhasil memposting ${res.count} jurnal ke Buku Besar UPJ.`);
+    } else {
+      setQuickNotice(res.error || 'Gagal posting jurnal.');
+    }
+    setTimeout(() => setQuickNotice(null), 4000);
+  };
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
-      {/* Title Header */}
-      <div>
-        <h2 className="text-2xl font-black tracking-tight text-slate-900">
-          Dashboard Overview
-        </h2>
-        <p className="text-xs text-slate-500 mt-1 font-medium">
-          Ringkasan penerimaan kas PPOB PLN dan status penyelesaian dana bank.
-        </p>
+      {/* Title Header with Role Context */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h2 className="text-2xl font-black tracking-tight text-slate-900">
+            Dashboard Overview
+          </h2>
+          <p className="text-xs text-slate-500 mt-1 font-medium">
+            Ringkasan penerimaan kas PPOB PLN dan status penyelesaian dana bank.
+          </p>
+        </div>
+
+        {/* Role Identity Tag */}
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-bold text-slate-600 bg-white border border-slate-200 px-3 py-1.5 rounded-xl shadow-2xs flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-blue-600"></span>
+            <span>Peran: <strong className="text-slate-900">{currentRole.replace(/_/g, ' ')}</strong></span>
+          </span>
+        </div>
       </div>
+
+      {quickNotice && (
+        <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-semibold flex items-center gap-2 shadow-xs">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+          <span>{quickNotice}</span>
+        </div>
+      )}
+
+      {/* Role-Specific Operational Quick Banner */}
+      {currentRole === 'PETUGAS_PPOB' && (
+        <div className="p-4 bg-sky-50 border border-sky-200/80 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-2.5">
+            <CreditCard className="w-5 h-5 text-sky-700 shrink-0" />
+            <div>
+              <span className="font-bold text-sky-950">Mode Kasir Loket PPOB Aktif: </span>
+              <span className="text-sky-900">Validasi identitas pelanggan, inquiry tagihan, dan cetak struk resmi pembayaran (W01–W07).</span>
+            </div>
+          </div>
+          <button
+            onClick={() => setActivePage('pembayaran')}
+            className="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white font-bold rounded-xl shrink-0 transition-colors shadow-2xs"
+          >
+            Buka Loket Pembayaran &rarr;
+          </button>
+        </div>
+      )}
+
+      {currentRole === 'SUPERVISOR' && (
+        <div className="p-4 bg-indigo-50 border border-indigo-200/80 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-2.5">
+            <ShieldCheck className="w-5 h-5 text-indigo-700 shrink-0" />
+            <div>
+              <span className="font-bold text-indigo-950">Mode Supervisor Keuangan: </span>
+              <span className="text-indigo-900">
+                {pendingApprovals.length > 0 
+                  ? `Terdapat ${pendingApprovals.length} usulan selisih kas (${pendingApprovals.map(p => p.kasus_id).join(', ')}) menanti otorisasi Anda (W10).`
+                  : 'Semua usulan investigasi selisih kas telah selesai ditinjau.'}
+              </span>
+            </div>
+          </div>
+          {pendingApprovals.length > 0 && (
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                onClick={() => handleQuickApprove(pendingApprovals[0].kasus_id)}
+                className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-colors shadow-2xs"
+              >
+                Setujui {pendingApprovals[0].kasus_id}
+              </button>
+              <button
+                onClick={() => {
+                  setSelectedKasusId(pendingApprovals[0].kasus_id);
+                  setActivePage('investigasi');
+                }}
+                className="px-3 py-1.5 bg-white border border-indigo-300 text-indigo-700 hover:bg-indigo-100 font-bold rounded-xl transition-colors"
+              >
+                Review Detail
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {currentRole === 'AKUNTANSI_UPJ' && (
+        <div className="p-4 bg-emerald-50 border border-emerald-200/80 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-2.5">
+            <BookOpen className="w-5 h-5 text-emerald-700 shrink-0" />
+            <div>
+              <span className="font-bold text-emerald-950">Mode Akuntansi UPJ/APJ: </span>
+              <span className="text-emerald-900">
+                {readyJournals.length > 0 
+                  ? `${readyJournals.length} jurnal hasil rekonsiliasi cocok (${formatRupiah(totalHasilCocok)}) siap diposting ke Buku Besar UPJ (W11).`
+                  : 'Seluruh jurnal penerimaan kas telah terposting ke Buku Besar.'}
+              </span>
+            </div>
+          </div>
+          {readyJournals.length > 0 && (
+            <button
+              onClick={handleQuickPostJournals}
+              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shrink-0 transition-colors shadow-2xs flex items-center gap-1.5"
+            >
+              <FileCheck className="w-4 h-4" />
+              <span>Posting {readyJournals.length} Jurnal</span>
+            </button>
+          )}
+        </div>
+      )}
 
       {/* 4 Stat Cards Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
