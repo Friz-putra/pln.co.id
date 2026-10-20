@@ -1,140 +1,143 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
-  LayoutDashboard, 
+  LayoutGrid, 
+  FileText, 
   CreditCard, 
-  FileCheck2, 
-  ArrowLeftRight, 
-  Scale, 
-  Search, 
+  Landmark, 
+  RefreshCw, 
+  ShieldAlert, 
   BookOpen, 
   GitMerge, 
   Database, 
   ShieldCheck,
-  AlertCircle
+  Search,
+  CheckCircle2
 } from 'lucide-react';
 import { usePPOB, PageId } from '../../context/PPOBContext';
 
 interface NavItem {
   id: PageId;
   label: string;
-  sublabel?: string;
   icon: React.ComponentType<{ className?: string }>;
   badge?: number | string;
 }
 
 export const Sidebar: React.FC = () => {
   const { activePage, setActivePage, kasusSelisihList } = usePPOB();
+  const [searchQuery, setSearchQuery] = useState('');
 
   const openKasusCount = kasusSelisihList.filter(k => k.status !== 'SELESAI').length;
 
-  const primaryNavs: NavItem[] = [
-    { id: 'dashboard', label: 'Dashboard', sublabel: 'Ringkasan penerimaan', icon: LayoutDashboard },
-    { id: 'pembayaran', label: 'Pembayaran', sublabel: '08 Tagihan PPOB', icon: CreditCard },
-    { id: 'bukti', label: 'Status Transaksi', sublabel: '09 Bukti bayar', icon: FileCheck2 },
-    { id: 'settlement', label: 'Settlement', sublabel: '10 Monitoring bank', icon: ArrowLeftRight },
-    { id: 'rekonsiliasi', label: 'Rekonsiliasi', sublabel: '11 Pencocokan W08', icon: Scale },
+  const commandNavs: NavItem[] = [
+    { id: 'dashboard', label: 'Dashboard Overview', icon: LayoutGrid },
+    { id: 'bukti', label: 'Status transaksi', icon: FileText },
+  ];
+
+  const penerimaanNavs: NavItem[] = [
+    { id: 'pembayaran', label: 'Pembayaran tagihan', icon: CreditCard },
+    { id: 'settlement', label: 'Settlement bank', icon: Landmark },
+    { id: 'rekonsiliasi', label: 'Rekonsiliasi', icon: RefreshCw },
     { 
       id: 'investigasi', 
-      label: 'Investigasi Selisih', 
-      sublabel: '12 Kasus KAS-001', 
-      icon: Search,
+      label: 'Investigasi selisih', 
+      icon: ShieldAlert,
       badge: openKasusCount > 0 ? openKasusCount : undefined
     },
-    { id: 'jurnal', label: 'Jurnal & Laporan', sublabel: '13 Pembukuan UPJ/APJ', icon: BookOpen },
   ];
 
-  const secondaryNavs: NavItem[] = [
-    { id: 'workflow', label: 'Alur Proses W01-W11', sublabel: 'BPMN To-Be', icon: GitMerge },
-    { id: 'erd', label: 'Arsitektur ERD (18 Tabel)', sublabel: 'Struktur Data Logis', icon: Database },
-    { id: 'audit', label: 'Jejak Audit Log', sublabel: 'Riwayat Transaksi', icon: ShieldCheck },
+  const akuntansiNavs: NavItem[] = [
+    { id: 'jurnal', label: 'Jurnal dan laporan', icon: BookOpen },
+    { id: 'workflow', label: 'Alur proses (W01-W11)', icon: GitMerge },
+    { id: 'erd', label: 'Arsitektur ERD (18 Tabel)', icon: Database },
+    { id: 'audit', label: 'Jejak audit log', icon: ShieldCheck },
   ];
+
+  const renderNavGroup = (title: string, items: NavItem[]) => (
+    <div className="space-y-1">
+      <div className="px-3 pb-1.5 text-[11px] font-bold tracking-wider text-slate-400 uppercase">
+        {title}
+      </div>
+      {items.map((item) => {
+        const Icon = item.icon;
+        const isActive = activePage === item.id;
+        return (
+          <button
+            key={item.id}
+            onClick={() => setActivePage(item.id)}
+            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-left text-xs font-semibold transition-all duration-150 ${
+              isActive
+                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/25'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80'
+            }`}
+          >
+            <div className="flex items-center gap-3 min-w-0">
+              <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-slate-400'}`} />
+              <span className="truncate">{item.label}</span>
+            </div>
+            {item.badge !== undefined && (
+              <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
+                isActive ? 'bg-white text-blue-700' : 'bg-rose-500 text-white'
+              }`}>
+                {item.badge}
+              </span>
+            )}
+          </button>
+        );
+      })}
+    </div>
+  );
 
   return (
-    <aside className="w-64 bg-[#0a2540] text-slate-200 flex flex-col shrink-0 min-h-screen border-r border-[#153456] select-none no-print">
+    <aside className="w-64 bg-white border-r border-slate-200/80 flex flex-col shrink-0 min-h-screen select-none no-print">
       {/* Brand Header */}
-      <div className="p-5 border-b border-[#17375a]">
-        <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-lg bg-sky-500 flex items-center justify-center font-black text-white text-lg tracking-wider shadow-sm">
-            ⚡
+      <div className="p-5 border-b border-slate-100">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center font-black text-white text-sm tracking-tight shadow-sm shadow-blue-500/30">
+            PP
           </div>
           <div>
-            <h1 className="text-xl font-extrabold tracking-tight text-white leading-tight">
+            <h1 className="text-base font-extrabold tracking-tight text-slate-900 leading-tight">
               PPOB PLN
             </h1>
-            <p className="text-[11px] text-sky-200/70 font-medium">
-              SIA Kas & Pembukuan UPJ
+            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+              PENERIMAAN KAS
             </p>
           </div>
         </div>
       </div>
 
-      {/* Main Nav Links */}
-      <div className="flex-1 py-4 px-3 space-y-1 overflow-y-auto">
-        <div className="px-3 pb-1 text-[10px] font-bold tracking-wider text-sky-300/60 uppercase">
-          Menu Operasional
+      {/* Search Input with ⌘K */}
+      <div className="px-4 pt-4 pb-2">
+        <div className="relative">
+          <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <input
+            type="text"
+            placeholder="Search..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-8 pr-8 py-2 text-xs bg-slate-50 hover:bg-slate-100/70 focus:bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-700 transition-all placeholder:text-slate-400"
+          />
+          <kbd className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] font-mono text-slate-400 bg-white border border-slate-200 px-1.5 py-0.5 rounded shadow-2xs pointer-events-none">
+            ⌘K
+          </kbd>
         </div>
-        {primaryNavs.map((item) => {
-          const Icon = item.icon;
-          const isActive = activePage === item.id;
-          return (
-            <button
-              key={item.id}
-              onClick={() => setActivePage(item.id)}
-              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-left transition-all duration-150 ${
-                isActive
-                  ? 'bg-sky-500 text-white font-semibold shadow-md shadow-sky-600/30'
-                  : 'text-slate-300 hover:bg-[#133355] hover:text-white font-medium'
-              }`}
-            >
-              <div className="flex items-center gap-3 min-w-0">
-                <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-sky-300/80'}`} />
-                <span className="truncate text-sm">{item.label}</span>
-              </div>
-              {item.badge !== undefined && (
-                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
-                  isActive ? 'bg-white text-sky-700' : 'bg-rose-500 text-white'
-                }`}>
-                  {item.badge}
-                </span>
-              )}
-            </button>
-          );
-        })}
-
-        <div className="pt-5 px-3 pb-1 text-[10px] font-bold tracking-wider text-sky-300/60 uppercase">
-          Dokumentasi & Audit
-        </div>
-        {secondaryNavs.map((item) => {
-          const Icon = item.icon;
-          const isActive = activePage === item.id;
-          return (
-            <button
-              key={item.id}
-              onClick={() => setActivePage(item.id)}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left text-xs transition-all duration-150 ${
-                isActive
-                  ? 'bg-sky-500/20 text-sky-200 border border-sky-400/30 font-semibold'
-                  : 'text-slate-400 hover:bg-[#133355] hover:text-slate-200'
-              }`}
-            >
-              <Icon className="w-4 h-4 shrink-0 text-sky-400" />
-              <div className="truncate">
-                <div>{item.label}</div>
-              </div>
-            </button>
-          );
-        })}
       </div>
 
-      {/* Footer Info Box */}
-      <div className="p-3.5 m-3 rounded-lg bg-[#0e3153]/80 border border-sky-900/40 text-xs text-sky-200/80">
-        <div className="flex items-center gap-1.5 text-sky-300 font-semibold mb-1">
-          <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-          <span>Simulasi Siklus Lengkap</span>
+      {/* Nav groups */}
+      <div className="flex-1 px-3 py-3 space-y-6 overflow-y-auto">
+        {renderNavGroup('COMMAND', commandNavs)}
+        {renderNavGroup('PENERIMAAN KAS', penerimaanNavs)}
+        {renderNavGroup('AKUNTANSI', akuntansiNavs)}
+      </div>
+
+      {/* Bottom Footer: Workspace */}
+      <div className="p-4 border-t border-slate-100">
+        <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+          WORKSPACE
         </div>
-        <p className="text-[11px] text-slate-300 leading-relaxed">
-          Dari kasir PPOB, settlement perbankan, rekonsiliasi W08, resolusi selisih KAS-001, hingga jurnal UPJ.
-        </p>
+        <div className="text-xs font-semibold text-slate-600">
+          Simulasi akademis MTSIA
+        </div>
       </div>
     </aside>
   );
