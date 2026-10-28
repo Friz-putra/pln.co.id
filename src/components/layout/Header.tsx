@@ -4,7 +4,7 @@ import { usePPOB } from '../../context/PPOBContext';
 import { UserRole } from '../../types/ppob';
 
 export const Header: React.FC<{ onToggleSidebar?: () => void }> = ({ onToggleSidebar }) => {
-  const { currentRole, setCurrentRole, resetDataToDefault, pelangganList, selectedPelangganId } = usePPOB();
+  const { currentRole, setCurrentRole, resetDataToDefault, pelangganList, selectedPelangganId, logout } = usePPOB();
   const [roleMenuOpen, setRoleMenuOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
 
@@ -140,12 +140,9 @@ export const Header: React.FC<{ onToggleSidebar?: () => void }> = ({ onToggleSid
 
         {/* Logout button */}
         <button
-          onClick={() => {
-            if (confirm('Keluar dari sesi demo atau reset data simulasi?')) {
-              resetDataToDefault();
-            }
-          }}
-          className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold text-rose-500 border border-rose-200 rounded-lg hover:bg-rose-50 transition-colors shadow-2xs"
+          onClick={() => logout()}
+          className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold text-rose-500 border border-rose-200 rounded-lg hover:bg-rose-50 transition-colors shadow-2xs cursor-pointer"
+          title="Keluar ke Halaman Login"
         >
           <LogOut className="w-3.5 h-3.5" />
           <span>Logout</span>

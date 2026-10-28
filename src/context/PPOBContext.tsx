@@ -49,6 +49,10 @@ interface PPOBContextType {
   setSelectedKasusId: (id: string) => void;
   selectedPelangganId: string;
   setSelectedPelangganId: (id: string) => void;
+  isAuthenticated: boolean;
+  setIsAuthenticated: (val: boolean) => void;
+  login: (role?: UserRole, username?: string) => void;
+  logout: () => void;
   
   // Data
   banks: Bank[];
@@ -89,6 +93,7 @@ export const PPOBProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [selectedTrxId, setSelectedTrxId] = useState<string>('TRX-003');
   const [selectedKasusId, setSelectedKasusId] = useState<string>('KAS-001');
   const [selectedPelangganId, setSelectedPelangganId] = useState<string>('PEL-003');
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
   const setCurrentRole = (role: UserRole) => {
     setCurrentRoleState(role);
@@ -97,6 +102,17 @@ export const PPOBProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else if (activePage === 'portal_pelanggan') {
       setActivePage('dashboard');
     }
+  };
+
+  const login = (role?: UserRole) => {
+    setIsAuthenticated(true);
+    if (role) {
+      setCurrentRole(role);
+    }
+  };
+
+  const logout = () => {
+    setIsAuthenticated(false);
   };
 
   // Core state collections
@@ -637,6 +653,10 @@ export const PPOBProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setSelectedKasusId,
         selectedPelangganId,
         setSelectedPelangganId,
+        isAuthenticated,
+        setIsAuthenticated,
+        login,
+        logout,
         banks,
         pelangganList,
         tagihanList,

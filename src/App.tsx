@@ -13,10 +13,15 @@ import { WorkflowView } from './components/pages/WorkflowView';
 import { ErdView } from './components/pages/ErdView';
 import { AuditLogView } from './components/pages/AuditLogView';
 import { PelangganPortalView } from './components/pages/PelangganPortalView';
+import { LoginView } from './components/pages/LoginView';
 
 const MainLayout: React.FC = () => {
-  const { activePage, currentRole } = usePPOB();
+  const { activePage, currentRole, isAuthenticated } = usePPOB();
   const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  if (!isAuthenticated) {
+    return <LoginView />;
+  }
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-[#f4f7fb] text-slate-900 font-sans">
