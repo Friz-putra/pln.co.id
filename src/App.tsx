@@ -14,6 +14,7 @@ import { ErdView } from './components/pages/ErdView';
 import { AuditLogView } from './components/pages/AuditLogView';
 import { PelangganPortalView } from './components/pages/PelangganPortalView';
 import { LoginView } from './components/pages/LoginView';
+import { UserManagementView } from './components/pages/UserManagementView';
 
 const MainLayout: React.FC = () => {
   const { activePage, currentRole, isAuthenticated } = usePPOB();
@@ -46,7 +47,9 @@ const MainLayout: React.FC = () => {
           {activePage === 'workflow' && <WorkflowView />}
           {activePage === 'erd' && <ErdView />}
           {activePage === 'audit' && <AuditLogView />}
+          {activePage === 'user_management' && <UserManagementView />}
         </main>
+
 
         {/* Footer matching reference image */}
         <footer className="px-8 py-5 border-t border-slate-200/70 text-xs text-slate-400 flex flex-wrap items-center justify-between gap-2 no-print bg-white/50">

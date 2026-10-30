@@ -9,8 +9,12 @@ import {
   KasusSelisih,
   Jurnal,
   Akun,
-  AuditLog
+  AuditLog,
+  AppUser,
+  PermissionItem,
+  UserRole
 } from '../types/ppob';
+
 
 export const INITIAL_BANKS: Bank[] = [
   {
@@ -455,3 +459,310 @@ export const INITIAL_AUDIT_LOG: AuditLog[] = [
     waktu: '2026-10-20 09:25:00 WIB'
   }
 ];
+
+export const INITIAL_USERS: AppUser[] = [
+  {
+    user_id: 'USR-001',
+    username: 'petugas',
+    nama_lengkap: 'Ahmad Faisal',
+    email: 'faisal.loket@pln.co.id',
+    telepon: '0812-9876-5432',
+    role: 'PETUGAS_PPOB',
+    unit_pln: 'Loket Gambir UP3 Menteng',
+    status: 'AKTIF',
+    last_login: '20 Okt 2026, 14:35 WIB',
+    created_at: '2026-01-15'
+  },
+  {
+    user_id: 'USR-002',
+    username: 'keuangan',
+    nama_lengkap: 'Friz Keuangan',
+    email: 'friz.keuangan@pln.co.id',
+    telepon: '0811-2345-6789',
+    role: 'KEUANGAN_DISTRIBUSI',
+    unit_pln: 'UID Jakarta Raya - Divisi Keuangan',
+    status: 'AKTIF',
+    last_login: '20 Okt 2026, 14:42 WIB',
+    created_at: '2026-01-10'
+  },
+  {
+    user_id: 'USR-003',
+    username: 'supervisor',
+    nama_lengkap: 'Budi Hartanto',
+    email: 'budi.supervisor@pln.co.id',
+    telepon: '0813-4567-8901',
+    role: 'SUPERVISOR',
+    unit_pln: 'UID Jakarta Raya - Pengawasan Kas',
+    status: 'AKTIF',
+    last_login: '20 Okt 2026, 11:20 WIB',
+    created_at: '2026-01-05'
+  },
+  {
+    user_id: 'USR-004',
+    username: 'akuntansi',
+    nama_lengkap: 'Siti Rahmawati, Ak.',
+    email: 'siti.akuntansi@pln.co.id',
+    telepon: '0815-6789-0123',
+    role: 'AKUNTANSI_UPJ',
+    unit_pln: 'UP3 Jakarta Pusat - Akuntansi',
+    status: 'AKTIF',
+    last_login: '20 Okt 2026, 13:10 WIB',
+    created_at: '2026-01-12'
+  },
+  {
+    user_id: 'USR-005',
+    username: 'admin',
+    nama_lengkap: 'Administrator Sistem',
+    email: 'admin.ppob@pln.co.id',
+    telepon: '0812-1111-2222',
+    role: 'ADMIN',
+    unit_pln: 'PLN Kantor Pusat - TI & Keamanan',
+    status: 'AKTIF',
+    last_login: '20 Okt 2026, 14:48 WIB',
+    created_at: '2026-01-01'
+  },
+  {
+    user_id: 'USR-006',
+    username: 'pelanggan',
+    nama_lengkap: 'Rahmat Hidayat',
+    email: 'rahmat.hidayat@gmail.com',
+    telepon: '0857-8901-2345',
+    role: 'PELANGGAN',
+    unit_pln: 'Konsumen Pascabayar R1/1300VA',
+    status: 'AKTIF',
+    last_login: '20 Okt 2026, 10:05 WIB',
+    created_at: '2026-02-01'
+  }
+];
+
+export const PERMISSION_ITEMS: PermissionItem[] = [
+  // Transaksi & Kasir
+  {
+    key: 'inquiry_tagihan',
+    label: 'Inquiry Tagihan Listrik',
+    deskripsi: 'Mencari ID Pelanggan dan mengecek rincian tagihan PLN (W01)',
+    kategori: 'TRANSAKSI'
+  },
+  {
+    key: 'bayar_tagihan',
+    label: 'Proses Pembayaran & Cetak Struk',
+    deskripsi: 'Menerima pembayaran kas dan menerbitkan nomor referensi/struk (W05-W07)',
+    kategori: 'TRANSAKSI'
+  },
+  {
+    key: 'batal_transaksi',
+    label: 'Pembatalan Transaksi Kasir',
+    deskripsi: 'Melakukan void/pembatalan transaksi kasir sebelum proses settlement',
+    kategori: 'TRANSAKSI'
+  },
+  {
+    key: 'cetak_ulang_struk',
+    label: 'Cetak Ulang Bukti Bayar',
+    deskripsi: 'Mengunduh dan mencetak salinan struk bukti pembayaran sah',
+    kategori: 'TRANSAKSI'
+  },
+
+  // Settlement & Perbankan
+  {
+    key: 'buat_settlement',
+    label: 'Generate Batch Settlement',
+    deskripsi: 'Membuat paket data transaksi loket untuk dikirimkan ke bank (W07A)',
+    kategori: 'SETTLEMENT'
+  },
+  {
+    key: 'upload_mutasi',
+    label: 'Upload Mutasi Rekening Bank',
+    deskripsi: 'Mengunggah rekening koran / mutasi kredit bank receipt (W07B)',
+    kategori: 'SETTLEMENT'
+  },
+  {
+    key: 'validasi_fee',
+    label: 'Verifikasi Biaya Admin Kanal',
+    deskripsi: 'Memeriksa selisih fee kanal agregator vs pendapatan PLN',
+    kategori: 'SETTLEMENT'
+  },
+
+  // Rekonsiliasi & Investigasi
+  {
+    key: 'jalankan_rekonsiliasi',
+    label: 'Eksekusi Pencocokan Otomatis',
+    deskripsi: 'Menjalankan engine pencocokan 3-way matching settlement vs mutasi (W08)',
+    kategori: 'REKONSILIASI'
+  },
+  {
+    key: 'buat_kasus_selisih',
+    label: 'Buka Tiket Investigasi Selisih',
+    deskripsi: 'Membuka lembar kerja investigasi untuk transaksi selisih/pending (W09)',
+    kategori: 'REKONSILIASI'
+  },
+  {
+    key: 'approval_selisih',
+    label: 'Otorisasi & Approval Selisih Kas',
+    deskripsi: 'Menyetujui usulan penyelesaian selisih penerimaan dan pelengkap transfer (W10)',
+    kategori: 'REKONSILIASI'
+  },
+  {
+    key: 'write_off_selisih',
+    label: 'Persetujuan Write-off Selisih',
+    deskripsi: 'Memberikan wewenang pembebanan selisih ke rekening penampungan selisih',
+    kategori: 'REKONSILIASI'
+  },
+
+  // Jurnal & Akuntansi
+  {
+    key: 'buat_draft_jurnal',
+    label: 'Generate Draf Jurnal Penerimaan',
+    deskripsi: 'Membuat draf jurnal double-entry otomatis hasil rekonsiliasi cocok (W11)',
+    kategori: 'JURNAL'
+  },
+  {
+    key: 'posting_buku_besar',
+    label: 'Posting Jurnal ke General Ledger',
+    deskripsi: 'Memposting jurnal draf ke Buku Besar (GL) ERP SAP PLN (W11B)',
+    kategori: 'JURNAL'
+  },
+  {
+    key: 'ekspor_laporan',
+    label: 'Ekspor Laporan Keuangan & Audit',
+    deskripsi: 'Mengunduh laporan rekapitulasi penerimaan harian/bulanan dalam PDF/Excel',
+    kategori: 'JURNAL'
+  },
+
+  // Sistem & Administrasi
+  {
+    key: 'lihat_audit_log',
+    label: 'Akses Jejak Audit Log Sistem',
+    deskripsi: 'Melihat riwayat log audit perubahan data transaksi, sistem, dan aktor',
+    kategori: 'SISTEM'
+  },
+  {
+    key: 'kelola_pengguna',
+    label: 'Manajemen Akun Pengguna',
+    deskripsi: 'Menambah, mengubah profil, reset kata sandi, dan nonaktifkan pengguna',
+    kategori: 'SISTEM'
+  },
+  {
+    key: 'atur_permission',
+    label: 'Konfigurasi Matriks Hak Akses',
+    deskripsi: 'Mengubah dan menetapkan hak akses / permission untuk setiap role pengguna',
+    kategori: 'SISTEM'
+  }
+];
+
+export const INITIAL_ROLE_PERMISSIONS: Record<UserRole, Record<string, boolean>> = {
+  PETUGAS_PPOB: {
+    inquiry_tagihan: true,
+    bayar_tagihan: true,
+    batal_transaksi: true,
+    cetak_ulang_struk: true,
+    buat_settlement: false,
+    upload_mutasi: false,
+    validasi_fee: false,
+    jalankan_rekonsiliasi: false,
+    buat_kasus_selisih: false,
+    approval_selisih: false,
+    write_off_selisih: false,
+    buat_draft_jurnal: false,
+    posting_buku_besar: false,
+    ekspor_laporan: false,
+    lihat_audit_log: false,
+    kelola_pengguna: false,
+    atur_permission: false
+  },
+  KEUANGAN_DISTRIBUSI: {
+    inquiry_tagihan: true,
+    bayar_tagihan: false,
+    batal_transaksi: false,
+    cetak_ulang_struk: true,
+    buat_settlement: true,
+    upload_mutasi: true,
+    validasi_fee: true,
+    jalankan_rekonsiliasi: true,
+    buat_kasus_selisih: true,
+    approval_selisih: false,
+    write_off_selisih: false,
+    buat_draft_jurnal: true,
+    posting_buku_besar: false,
+    ekspor_laporan: true,
+    lihat_audit_log: true,
+    kelola_pengguna: false,
+    atur_permission: false
+  },
+  SUPERVISOR: {
+    inquiry_tagihan: true,
+    bayar_tagihan: false,
+    batal_transaksi: true,
+    cetak_ulang_struk: true,
+    buat_settlement: true,
+    upload_mutasi: true,
+    validasi_fee: true,
+    jalankan_rekonsiliasi: true,
+    buat_kasus_selisih: true,
+    approval_selisih: true,
+    write_off_selisih: true,
+    buat_draft_jurnal: true,
+    posting_buku_besar: true,
+    ekspor_laporan: true,
+    lihat_audit_log: true,
+    kelola_pengguna: true,
+    atur_permission: true
+  },
+  AKUNTANSI_UPJ: {
+    inquiry_tagihan: true,
+    bayar_tagihan: false,
+    batal_transaksi: false,
+    cetak_ulang_struk: true,
+    buat_settlement: false,
+    upload_mutasi: false,
+    validasi_fee: true,
+    jalankan_rekonsiliasi: true,
+    buat_kasus_selisih: false,
+    approval_selisih: false,
+    write_off_selisih: false,
+    buat_draft_jurnal: true,
+    posting_buku_besar: true,
+    ekspor_laporan: true,
+    lihat_audit_log: true,
+    kelola_pengguna: false,
+    atur_permission: false
+  },
+  PELANGGAN: {
+    inquiry_tagihan: true,
+    bayar_tagihan: true,
+    batal_transaksi: false,
+    cetak_ulang_struk: true,
+    buat_settlement: false,
+    upload_mutasi: false,
+    validasi_fee: false,
+    jalankan_rekonsiliasi: false,
+    buat_kasus_selisih: false,
+    approval_selisih: false,
+    write_off_selisih: false,
+    buat_draft_jurnal: false,
+    posting_buku_besar: false,
+    ekspor_laporan: false,
+    lihat_audit_log: false,
+    kelola_pengguna: false,
+    atur_permission: false
+  },
+  ADMIN: {
+    inquiry_tagihan: true,
+    bayar_tagihan: true,
+    batal_transaksi: true,
+    cetak_ulang_struk: true,
+    buat_settlement: true,
+    upload_mutasi: true,
+    validasi_fee: true,
+    jalankan_rekonsiliasi: true,
+    buat_kasus_selisih: true,
+    approval_selisih: true,
+    write_off_selisih: true,
+    buat_draft_jurnal: true,
+    posting_buku_besar: true,
+    ekspor_laporan: true,
+    lihat_audit_log: true,
+    kelola_pengguna: true,
+    atur_permission: true
+  }
+};
+

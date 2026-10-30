@@ -4,7 +4,7 @@ import { usePPOB } from '../../context/PPOBContext';
 import { UserRole } from '../../types/ppob';
 
 export const Header: React.FC<{ onToggleSidebar?: () => void }> = ({ onToggleSidebar }) => {
-  const { currentRole, setCurrentRole, resetDataToDefault, pelangganList, selectedPelangganId, logout } = usePPOB();
+  const { currentRole, setCurrentRole, resetDataToDefault, pelangganList, selectedPelangganId, logout, currentUser } = usePPOB();
   const [roleMenuOpen, setRoleMenuOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
 
@@ -23,14 +23,17 @@ export const Header: React.FC<{ onToggleSidebar?: () => void }> = ({ onToggleSid
 
   const displayName = currentRole === 'PELANGGAN' 
     ? `${activeCustomer.nama}` 
-    : 'Friz (Demo)';
+    : (currentUser?.nama_lengkap || 'Friz');
 
   const displaySubtitle = currentRole === 'PELANGGAN'
     ? `IDPEL: ${activeCustomer.nomor_pelanggan}`
     : currentRoleObj.label;
 
-  const avatarInitial = currentRole === 'PELANGGAN' ? 'P' : 'F';
+  const avatarInitial = currentRole === 'PELANGGAN' 
+    ? (activeCustomer.nama.charAt(0) || 'P') 
+    : (currentUser?.nama_lengkap.charAt(0) || 'F');
   const avatarBg = currentRole === 'PELANGGAN' ? 'bg-amber-600' : 'bg-blue-600';
+
 
   return (
     <header className="h-16 bg-white border-b border-slate-200/80 px-6 flex items-center justify-between gap-4 sticky top-0 z-20 no-print">

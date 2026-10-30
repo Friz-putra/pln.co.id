@@ -11,7 +11,8 @@ import {
   Search,
   Zap,
   Clock,
-  UserCheck
+  UserCheck,
+  Users
 } from 'lucide-react';
 import { usePPOB, PageId } from '../../context/PPOBContext';
 
@@ -49,7 +50,9 @@ export const Sidebar: React.FC = () => {
   const akuntansiNavs: NavItem[] = [
     { id: 'jurnal', label: 'Jurnal dan laporan', icon: BookOpen },
     { id: 'audit', label: 'Audit log', icon: ShieldCheck },
+    { id: 'user_management', label: 'User Management', icon: Users },
   ];
+
 
   // Navigation for Customer role (PELANGGAN)
   const pelangganCommandNavs: NavItem[] = [

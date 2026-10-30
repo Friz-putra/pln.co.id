@@ -10,7 +10,9 @@ import {
   KasusSelisih,
   Jurnal,
   AuditLog,
-  Bank
+  Bank,
+  AppUser,
+  PermissionItem
 } from '../types/ppob';
 import {
   INITIAL_BANKS,
@@ -22,7 +24,10 @@ import {
   INITIAL_DETAIL_REKONSILIASI,
   INITIAL_KASUS_SELISIH,
   INITIAL_JURNAL,
-  INITIAL_AUDIT_LOG
+  INITIAL_AUDIT_LOG,
+  INITIAL_USERS,
+  PERMISSION_ITEMS,
+  INITIAL_ROLE_PERMISSIONS
 } from '../data/initialData';
 
 export type PageId = 
@@ -36,7 +41,8 @@ export type PageId =
   | 'workflow'
   | 'erd'
   | 'audit'
-  | 'portal_pelanggan';
+  | 'portal_pelanggan'
+  | 'user_management';
 
 interface PPOBContextType {
   currentRole: UserRole;
@@ -53,6 +59,7 @@ interface PPOBContextType {
   setIsAuthenticated: (val: boolean) => void;
   login: (role?: UserRole, username?: string) => void;
   logout: () => void;
+  currentUser?: AppUser;
   
   // Data
   banks: Bank[];
@@ -65,6 +72,21 @@ interface PPOBContextType {
   kasusSelisihList: KasusSelisih[];
   jurnalList: Jurnal[];
   auditLogs: AuditLog[];
+
+  // User Management & Permissions
+  users: AppUser[];
+  permissionItems: PermissionItem[];
+  rolePermissions: Record<UserRole, Record<string, boolean>>;
+  addUser: (user: Omit<AppUser, 'user_id' | 'created_at'>) => void;
+  updateUser: (userId: string, data: Partial<AppUser>) => void;
+  deleteUser: (userId: string) => { success: boolean; message: string };
+  toggleUserStatus: (userId: string) => void;
+  resetUserPassword: (userId: string) => { success: boolean; message: string };
+  updateRolePermission: (role: UserRole, permissionKey: string, allowed: boolean) => void;
+  updateUserCustomPermission: (userId: string, permissionKey: string, allowed: boolean) => void;
+  resetPermissionsToDefault: () => void;
+  hasPermission: (permissionKey: string, role?: UserRole, userId?: string) => boolean;
+
 
   // Actions
   findPelangganWithTagihan: (nomor: string) => { pelanggan?: Pelanggan; tagihan?: Tagihan } | null;
@@ -104,16 +126,7 @@ export const PPOBProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const login = (role?: UserRole) => {
-    setIsAuthenticated(true);
-    if (role) {
-      setCurrentRole(role);
-    }
-  };
-
-  const logout = () => {
-    setIsAuthenticated(false);
-  };
+  const [activeUsername, setActiveUsername] = useState<string>('keuangan');
 
   // Core state collections
   const [banks] = useState<Bank[]>(INITIAL_BANKS);
@@ -126,6 +139,31 @@ export const PPOBProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [kasusSelisihList, setKasusSelisihList] = useState<KasusSelisih[]>(INITIAL_KASUS_SELISIH);
   const [jurnalList, setJurnalList] = useState<Jurnal[]>(INITIAL_JURNAL);
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>(INITIAL_AUDIT_LOG);
+
+  // User Management State
+  const [users, setUsers] = useState<AppUser[]>(INITIAL_USERS);
+  const [rolePermissions, setRolePermissions] = useState<Record<UserRole, Record<string, boolean>>>(INITIAL_ROLE_PERMISSIONS);
+  const permissionItems = PERMISSION_ITEMS;
+
+  const currentUser = users.find(u => u.username === activeUsername) || users.find(u => u.role === currentRole) || users[0];
+
+  const login = (role?: UserRole, username?: string) => {
+    setIsAuthenticated(true);
+    if (username) {
+      setActiveUsername(username);
+    }
+    if (role) {
+      setCurrentRole(role);
+      const match = users.find(u => u.role === role);
+      if (match && !username) {
+        setActiveUsername(match.username);
+      }
+    }
+  };
+
+  const logout = () => {
+    setIsAuthenticated(false);
+  };
 
   // Load from local storage if available
   useEffect(() => {
@@ -141,6 +179,8 @@ export const PPOBProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (parsed.kasusSelisihList) setKasusSelisihList(parsed.kasusSelisihList);
         if (parsed.jurnalList) setJurnalList(parsed.jurnalList);
         if (parsed.auditLogs) setAuditLogs(parsed.auditLogs);
+        if (parsed.users) setUsers(parsed.users);
+        if (parsed.rolePermissions) setRolePermissions(parsed.rolePermissions);
       }
     } catch {
       // ignore parse errors
@@ -158,13 +198,16 @@ export const PPOBProvider: React.FC<{ children: React.ReactNode }> = ({ children
         rekonsiliasiList,
         kasusSelisihList,
         jurnalList,
-        auditLogs
+        auditLogs,
+        users,
+        rolePermissions
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
     } catch {
       // ignore storage errors
     }
-  }, [pembayaranList, tagihanList, settlementList, mutasiBankList, rekonsiliasiList, kasusSelisihList, jurnalList, auditLogs]);
+  }, [pembayaranList, tagihanList, settlementList, mutasiBankList, rekonsiliasiList, kasusSelisihList, jurnalList, auditLogs, users, rolePermissions]);
+
 
   // Lookup customer and bill
   const findPelangganWithTagihan = (nomor: string) => {
@@ -623,6 +666,207 @@ export const PPOBProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   };
 
+  // User Management Actions
+  const addUser = (newUser: Omit<AppUser, 'user_id' | 'created_at'>) => {
+    const pad = String(users.length + 1).padStart(3, '0');
+    const createdUser: AppUser = {
+      ...newUser,
+      user_id: `USR-${pad}`,
+      created_at: new Date().toISOString().split('T')[0],
+      last_login: '-'
+    };
+    setUsers(prev => [createdUser, ...prev]);
+
+    // Audit log
+    const nowTime = `${new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB`;
+    setAuditLogs(prev => [
+      {
+        log_id: `LOG-USR-${Date.now().toString().slice(-4)}`,
+        aktor_sistem: `${currentRole} (Admin/User Mgmt)`,
+        entitas: 'PENGGUNA',
+        entitas_id: createdUser.user_id,
+        aksi: 'TAMBAH_PENGGUNA_BARU',
+        correlation_id: `USR-ADD-${createdUser.username.toUpperCase()}`,
+        sebelum: null,
+        sesudah: { username: createdUser.username, role: createdUser.role, unit: createdUser.unit_pln },
+        waktu: `2026-10-20 ${nowTime}`
+      },
+      ...prev
+    ]);
+  };
+
+  const updateUser = (userId: string, data: Partial<AppUser>) => {
+    const existing = users.find(u => u.user_id === userId);
+    setUsers(prev => prev.map(u => u.user_id === userId ? { ...u, ...data } : u));
+
+    const nowTime = `${new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB`;
+    setAuditLogs(prev => [
+      {
+        log_id: `LOG-USR-${Date.now().toString().slice(-4)}`,
+        aktor_sistem: `${currentRole} (Admin/User Mgmt)`,
+        entitas: 'PENGGUNA',
+        entitas_id: userId,
+        aksi: 'PERBARUI_PROFIL_PENGGUNA',
+        correlation_id: `USR-UPD-${userId}`,
+        sebelum: existing ? { role: existing.role, unit: existing.unit_pln, status: existing.status } : null,
+        sesudah: data,
+        waktu: `2026-10-20 ${nowTime}`
+      },
+      ...prev
+    ]);
+  };
+
+  const deleteUser = (userId: string): { success: boolean; message: string } => {
+    const target = users.find(u => u.user_id === userId);
+    if (!target) return { success: false, message: 'Pengguna tidak ditemukan' };
+    if (target.role === 'ADMIN' && users.filter(u => u.role === 'ADMIN').length <= 1) {
+      return { success: false, message: 'Tidak dapat menghapus satu-satunya akun Administrator sistem' };
+    }
+
+    setUsers(prev => prev.filter(u => u.user_id !== userId));
+
+    const nowTime = `${new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB`;
+    setAuditLogs(prev => [
+      {
+        log_id: `LOG-USR-${Date.now().toString().slice(-4)}`,
+        aktor_sistem: `${currentRole} (Admin/User Mgmt)`,
+        entitas: 'PENGGUNA',
+        entitas_id: userId,
+        aksi: 'HAPUS_PENGGUNA',
+        correlation_id: `USR-DEL-${userId}`,
+        sebelum: { username: target.username, role: target.role },
+        sesudah: null,
+        waktu: `2026-10-20 ${nowTime}`
+      },
+      ...prev
+    ]);
+
+    return { success: true, message: `Akun ${target.nama_lengkap} (${target.username}) berhasil dihapus` };
+  };
+
+  const toggleUserStatus = (userId: string) => {
+    const target = users.find(u => u.user_id === userId);
+    if (!target) return;
+    const newStatus = target.status === 'AKTIF' ? 'NONAKTIF' : 'AKTIF';
+    setUsers(prev => prev.map(u => u.user_id === userId ? { ...u, status: newStatus } : u));
+
+    const nowTime = `${new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB`;
+    setAuditLogs(prev => [
+      {
+        log_id: `LOG-USR-${Date.now().toString().slice(-4)}`,
+        aktor_sistem: `${currentRole} (Admin/User Mgmt)`,
+        entitas: 'PENGGUNA',
+        entitas_id: userId,
+        aksi: newStatus === 'AKTIF' ? 'AKTIFKAN_PENGGUNA' : 'NONAKTIFKAN_PENGGUNA',
+        correlation_id: `USR-STS-${userId}`,
+        sebelum: { status: target.status },
+        sesudah: { status: newStatus },
+        waktu: `2026-10-20 ${nowTime}`
+      },
+      ...prev
+    ]);
+  };
+
+  const resetUserPassword = (userId: string): { success: boolean; message: string } => {
+    const target = users.find(u => u.user_id === userId);
+    if (!target) return { success: false, message: 'Pengguna tidak ditemukan' };
+
+    const nowTime = `${new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB`;
+    setAuditLogs(prev => [
+      {
+        log_id: `LOG-PWD-${Date.now().toString().slice(-4)}`,
+        aktor_sistem: `${currentRole} (Admin/User Mgmt)`,
+        entitas: 'PENGGUNA',
+        entitas_id: userId,
+        aksi: 'RESET_PASSWORD_PENGGUNA',
+        correlation_id: `PWD-RST-${userId}`,
+        sebelum: null,
+        sesudah: { action: 'Temporary password issued via secure notification' },
+        waktu: `2026-10-20 ${nowTime}`
+      },
+      ...prev
+    ]);
+
+    return { 
+      success: true, 
+      message: `Kata sandi ${target.nama_lengkap} berhasil di-reset ke default ("PLN@2026")` 
+    };
+  };
+
+  // Permission Configuration Actions
+  const updateRolePermission = (role: UserRole, permissionKey: string, allowed: boolean) => {
+    setRolePermissions(prev => ({
+      ...prev,
+      [role]: {
+        ...prev[role],
+        [permissionKey]: allowed
+      }
+    }));
+
+    const nowTime = `${new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB`;
+    setAuditLogs(prev => [
+      {
+        log_id: `LOG-PERM-${Date.now().toString().slice(-4)}`,
+        aktor_sistem: `${currentRole} (Admin/User Mgmt)`,
+        entitas: 'PERMISSION',
+        entitas_id: `${role}:${permissionKey}`,
+        aksi: allowed ? 'BERIKAN_HAK_AKSES' : 'CABUT_HAK_AKSES',
+        correlation_id: `PERM-${role}-${permissionKey}`,
+        sebelum: { role, permissionKey, status: !allowed },
+        sesudah: { role, permissionKey, status: allowed },
+        waktu: `2026-10-20 ${nowTime}`
+      },
+      ...prev
+    ]);
+  };
+
+  const updateUserCustomPermission = (userId: string, permissionKey: string, allowed: boolean) => {
+    setUsers(prev => prev.map(u => {
+      if (u.user_id === userId) {
+        return {
+          ...u,
+          custom_permissions: {
+            ...(u.custom_permissions || {}),
+            [permissionKey]: allowed
+          }
+        };
+      }
+      return u;
+    }));
+  };
+
+  const resetPermissionsToDefault = () => {
+    setRolePermissions(INITIAL_ROLE_PERMISSIONS);
+    setUsers(INITIAL_USERS);
+
+    const nowTime = `${new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB`;
+    setAuditLogs(prev => [
+      {
+        log_id: `LOG-PERM-RST-${Date.now().toString().slice(-4)}`,
+        aktor_sistem: `${currentRole} (Admin/User Mgmt)`,
+        entitas: 'PERMISSION',
+        entitas_id: 'ALL_ROLES',
+        aksi: 'RESET_MATRIKS_PERMISSION_DEFAULT',
+        correlation_id: `PERM-RST-ALL`,
+        sebelum: null,
+        sesudah: { status: 'RESET_TO_PLN_STANDARD' },
+        waktu: `2026-10-20 ${nowTime}`
+      },
+      ...prev
+    ]);
+  };
+
+  const hasPermission = (permissionKey: string, role?: UserRole, userId?: string): boolean => {
+    const checkRole = role || currentRole;
+    if (userId) {
+      const user = users.find(u => u.user_id === userId);
+      if (user?.custom_permissions && typeof user.custom_permissions[permissionKey] === 'boolean') {
+        return user.custom_permissions[permissionKey];
+      }
+    }
+    return !!rolePermissions[checkRole]?.[permissionKey];
+  };
+
   // Reset to default
   const resetDataToDefault = () => {
     localStorage.removeItem(STORAGE_KEY);
@@ -635,6 +879,8 @@ export const PPOBProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setKasusSelisihList(INITIAL_KASUS_SELISIH);
     setJurnalList(INITIAL_JURNAL);
     setAuditLogs(INITIAL_AUDIT_LOG);
+    setUsers(INITIAL_USERS);
+    setRolePermissions(INITIAL_ROLE_PERMISSIONS);
     setSelectedTrxId('TRX-003');
     setSelectedKasusId('KAS-001');
     setActivePage('dashboard');
@@ -657,6 +903,7 @@ export const PPOBProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setIsAuthenticated,
         login,
         logout,
+        currentUser,
         banks,
         pelangganList,
         tagihanList,
@@ -667,6 +914,18 @@ export const PPOBProvider: React.FC<{ children: React.ReactNode }> = ({ children
         kasusSelisihList,
         jurnalList,
         auditLogs,
+        users,
+        permissionItems,
+        rolePermissions,
+        addUser,
+        updateUser,
+        deleteUser,
+        toggleUserStatus,
+        resetUserPassword,
+        updateRolePermission,
+        updateUserCustomPermission,
+        resetPermissionsToDefault,
+        hasPermission,
         findPelangganWithTagihan,
         processPayment,
         runReconciliation,
@@ -680,6 +939,7 @@ export const PPOBProvider: React.FC<{ children: React.ReactNode }> = ({ children
       {children}
     </PPOBContext.Provider>
   );
+
 };
 
 export const usePPOB = () => {

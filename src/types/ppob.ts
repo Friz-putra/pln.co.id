@@ -179,3 +179,29 @@ export interface AuditLog {
   sesudah?: Record<string, unknown> | null;
   waktu: string;
 }
+
+export type UserStatus = 'AKTIF' | 'NONAKTIF';
+
+export interface AppUser {
+  user_id: string;
+  username: string;
+  nama_lengkap: string;
+  email: string;
+  telepon?: string;
+  role: UserRole;
+  unit_pln: string;
+  status: UserStatus;
+  last_login?: string;
+  created_at: string;
+  custom_permissions?: Record<string, boolean>;
+}
+
+export type PermissionCategory = 'TRANSAKSI' | 'SETTLEMENT' | 'REKONSILIASI' | 'JURNAL' | 'SISTEM';
+
+export interface PermissionItem {
+  key: string;
+  label: string;
+  deskripsi: string;
+  kategori: PermissionCategory;
+}
+
