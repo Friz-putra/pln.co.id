@@ -97,7 +97,7 @@ export const InvestigasiView: React.FC = () => {
 
       {/* Discrepancy Highlight Header Strip */}
       <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-950 text-xs font-semibold flex flex-wrap items-center justify-between gap-2 shadow-xs">
-        <div className="flex items-center gap-2 font-mono">
+        <div className="flex items-center gap-2">
           <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
           <span>{activeKasus.settlement_id} / {activeKasus.mutasi_id}</span>
           <span className="text-rose-400">·</span>
@@ -163,7 +163,7 @@ export const InvestigasiView: React.FC = () => {
             </label>
             <div className="flex items-center gap-2 p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs">
               <FileText className="w-4 h-4 text-rose-600 shrink-0" />
-              <span className="font-mono text-slate-700 font-medium">{activeKasus.bukti_uri}</span>
+              <span className="text-slate-700 font-medium">{activeKasus.bukti_uri}</span>
               <button
                 onClick={() => alert(`Membuka lampiran bukti: ${activeKasus.bukti_uri}\nKonfirmasi transfer parsial dari bank mitra aggregator.`)}
                 className="ml-auto text-[11px] text-sky-700 hover:underline font-semibold flex items-center gap-1"
@@ -217,7 +217,7 @@ export const InvestigasiView: React.FC = () => {
               {activeKasus.riwayat.map((step, idx) => (
                 <div key={idx} className="relative pl-5 border-l-2 border-sky-200 space-y-0.5">
                   <div className="w-2.5 h-2.5 rounded-full bg-sky-500 absolute -left-[6px] top-1"></div>
-                  <div className="font-bold text-slate-900 font-mono">
+                  <div className="font-bold text-slate-900">
                     {step.waktu} · {step.aktor}
                   </div>
                   <p className="text-slate-600 leading-relaxed">

@@ -207,7 +207,7 @@ export const DashboardView: React.FC = () => {
             <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
               TOTAL PEMBAYARAN
             </div>
-            <div className="text-2xl font-black text-blue-600 mt-1 font-mono tabular-nums">
+            <div className="text-2xl font-bold text-blue-600 mt-1">
               {formatRupiah(totalPembayaran)}
             </div>
             <div className="text-xs text-slate-400 mt-1 font-medium">
@@ -231,7 +231,7 @@ export const DashboardView: React.FC = () => {
             <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
               DANA RECEIPT
             </div>
-            <div className="text-2xl font-black text-blue-600 mt-1 font-mono tabular-nums">
+            <div className="text-2xl font-bold text-blue-600 mt-1">
               {formatRupiah(totalDanaReceipt)}
             </div>
             <div className="text-xs text-slate-400 mt-1 font-medium">
@@ -255,7 +255,7 @@ export const DashboardView: React.FC = () => {
             <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
               HASIL REKONSILIASI
             </div>
-            <div className="text-2xl font-black text-slate-800 mt-1 font-mono tabular-nums">
+            <div className="text-2xl font-bold text-slate-800 mt-1">
               {cocokCount} Cocok
             </div>
             <div className="text-xs text-slate-400 mt-1 font-medium">
@@ -279,7 +279,7 @@ export const DashboardView: React.FC = () => {
             <div className="text-[11px] font-bold text-amber-600 uppercase tracking-wider">
               SELISIH PENERIMAAN
             </div>
-            <div className="text-2xl font-black text-amber-500 mt-1 font-mono tabular-nums">
+            <div className="text-2xl font-bold text-amber-500 mt-1">
               {formatRupiah(totalSelisihAmount)}
             </div>
             <div className="text-xs text-slate-400 mt-1 font-medium">
@@ -373,7 +373,7 @@ export const DashboardView: React.FC = () => {
               TOTAL TRANSAKSI PEMBAYARAN
             </div>
             <div className="flex items-baseline gap-2">
-              <span className="text-4xl font-black text-slate-900 font-mono">
+              <span className="text-4xl font-black text-slate-900">
                 {totalTrxCount}
               </span>
               <span className="text-xs text-slate-500 font-medium">
@@ -443,7 +443,7 @@ export const DashboardView: React.FC = () => {
                 </div>
                 <div className="flex-1 bg-slate-100 h-9 rounded-xl overflow-hidden relative">
                   <div
-                    className="bg-gradient-to-r from-blue-600 to-indigo-600 h-full rounded-xl flex items-center px-4 text-xs font-mono font-bold text-white shadow-2xs transition-all duration-500"
+                    className="bg-gradient-to-r from-blue-600 to-indigo-600 h-full rounded-xl flex items-center px-4 text-xs font-bold text-white shadow-2xs transition-all duration-500"
                     style={{ width: `${pctHakPln}%` }}
                   >
                     {formatRupiah(totalPembayaran)}
@@ -458,7 +458,7 @@ export const DashboardView: React.FC = () => {
                 </div>
                 <div className="flex-1 bg-slate-100 h-9 rounded-xl overflow-hidden relative">
                   <div
-                    className="bg-gradient-to-r from-blue-600 to-indigo-600 h-full rounded-xl flex items-center px-4 text-xs font-mono font-bold text-white shadow-2xs transition-all duration-500"
+                    className="bg-gradient-to-r from-blue-600 to-indigo-600 h-full rounded-xl flex items-center px-4 text-xs font-bold text-white shadow-2xs transition-all duration-500"
                     style={{ width: `${pctDanaReceipt}%` }}
                   >
                     {formatRupiah(totalDanaReceipt)}
@@ -473,7 +473,7 @@ export const DashboardView: React.FC = () => {
                 </div>
                 <div className="flex-1 bg-slate-100 h-9 rounded-xl overflow-hidden relative">
                   <div
-                    className="bg-gradient-to-r from-blue-600 to-indigo-600 h-full rounded-xl flex items-center px-4 text-xs font-mono font-bold text-white shadow-2xs transition-all duration-500"
+                    className="bg-gradient-to-r from-blue-600 to-indigo-600 h-full rounded-xl flex items-center px-4 text-xs font-bold text-white shadow-2xs transition-all duration-500"
                     style={{ width: `${pctHasilCocok}%` }}
                   >
                     {formatRupiah(totalHasilCocok)}

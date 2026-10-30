@@ -136,19 +136,19 @@ export const RekonsiliasiView: React.FC = () => {
 
                 return (
                   <tr key={row.hasil_id} className="hover:bg-slate-50 transition-colors">
-                    <td className="px-5 py-3.5 font-mono font-semibold text-sky-800">
+                    <td className="px-5 py-3.5 font-bold text-sky-800">
                       {row.settlement_id}
                     </td>
-                    <td className="px-5 py-3.5 font-mono text-slate-700">
+                    <td className="px-5 py-3.5 text-slate-700 font-medium">
                       {row.mutasi_id || '—'}
                     </td>
-                    <td className="px-5 py-3.5 text-right font-mono font-medium text-slate-900">
+                    <td className="px-5 py-3.5 text-right font-medium text-slate-900">
                       {formatNumber(row.ekspektasi)}
                     </td>
-                    <td className="px-5 py-3.5 text-right font-mono font-bold text-slate-900">
+                    <td className="px-5 py-3.5 text-right font-bold text-slate-900">
                       {formatNumber(row.aktual)}
                     </td>
-                    <td className={`px-5 py-3.5 text-right font-mono font-bold ${
+                    <td className={`px-5 py-3.5 text-right font-bold ${
                       row.selisih < 0 ? 'text-rose-600' : 'text-slate-900'
                     }`}>
                       {row.selisih === 0 ? '0' : formatNumber(row.selisih)}
@@ -205,7 +205,7 @@ export const RekonsiliasiView: React.FC = () => {
             <span className="text-slate-500">{tertundaList.length} tertunda</span>
           </div>
 
-          <div className="text-sky-800 font-mono font-bold">
+          <div className="text-sky-800 font-bold">
             {formatRupiah(totalSiapDibukukan)} siap dibukukan
           </div>
         </div>

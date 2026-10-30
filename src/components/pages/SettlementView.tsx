@@ -141,10 +141,10 @@ export const SettlementView: React.FC = () => {
 
                 return (
                   <tr key={set.settlement_id} className="hover:bg-slate-50 transition-colors">
-                    <td className="px-6 py-3.5 font-mono font-semibold text-sky-800">
+                    <td className="px-6 py-3.5 font-bold text-sky-800">
                       {set.settlement_id}
                     </td>
-                    <td className="px-6 py-3.5 font-mono text-slate-700">
+                    <td className="px-6 py-3.5 text-slate-700 font-medium">
                       <button
                         onClick={() => {
                           setSelectedTrxId(set.pembayaran_id);
@@ -155,15 +155,15 @@ export const SettlementView: React.FC = () => {
                         {set.pembayaran_id}
                       </button>
                     </td>
-                    <td className="px-6 py-3.5 text-right font-mono font-bold text-slate-900">
+                    <td className="px-6 py-3.5 text-right font-bold text-slate-900">
                       {formatNumber(set.nominal_pln)}
                     </td>
-                    <td className={`px-6 py-3.5 text-right font-mono font-bold ${
+                    <td className={`px-6 py-3.5 text-right font-bold ${
                       hasDiscrepancy ? 'text-rose-600 bg-rose-50/50' : 'text-slate-900'
                     }`}>
                       {formatNumber(danaMasuk)}
                     </td>
-                    <td className="px-6 py-3.5 font-mono text-slate-600">
+                    <td className="px-6 py-3.5 text-slate-600">
                       {set.ref_settlement}
                     </td>
                     <td className="px-6 py-3.5 text-center">
@@ -181,10 +181,10 @@ export const SettlementView: React.FC = () => {
                 <td colSpan={2} className="px-6 py-3 uppercase text-slate-800 tracking-wider">
                   TOTAL
                 </td>
-                <td className="px-6 py-3 text-right font-mono text-slate-900 text-sm">
+                <td className="px-6 py-3 text-right font-bold text-slate-900 text-sm">
                   {formatNumber(totalHakPln)}
                 </td>
-                <td className="px-6 py-3 text-right font-mono text-sky-900 text-sm">
+                <td className="px-6 py-3 text-right font-bold text-sky-900 text-sm">
                   {formatNumber(totalDanaMasuk)}
                 </td>
                 <td colSpan={2} className="px-6 py-3"></td>

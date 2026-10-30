@@ -274,7 +274,7 @@ export const WorkflowView: React.FC = () => {
             <tbody className="divide-y divide-slate-200">
               {WORKFLOW_SPECS.map((spec) => (
                 <tr key={spec.id} className="hover:bg-slate-50 transition-colors">
-                  <td className="px-4 py-3 font-mono font-bold text-sky-800">
+                  <td className="px-4 py-3 font-bold text-sky-800">
                     {spec.id}
                   </td>
                   <td className="px-4 py-3 font-semibold text-slate-900">
@@ -283,7 +283,7 @@ export const WorkflowView: React.FC = () => {
                   <td className="px-4 py-3 text-slate-700">
                     {spec.pemicu}
                   </td>
-                  <td className="px-4 py-3 font-mono text-[11px] text-slate-600">
+                  <td className="px-4 py-3 text-[11px] text-slate-600 font-medium">
                     {spec.ioTabel}
                   </td>
                   <td className="px-4 py-3 text-slate-600 leading-relaxed">

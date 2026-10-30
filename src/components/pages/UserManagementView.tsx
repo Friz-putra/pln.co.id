@@ -489,7 +489,7 @@ export const UserManagementView: React.FC = () => {
 
                           {/* Username */}
                           <td className="py-3.5 px-3">
-                            <span className="font-mono text-slate-700 bg-slate-100 px-2 py-0.5 rounded text-[11px]">
+                            <span className="font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded text-[11px]">
                               {u.username}
                             </span>
                           </td>
@@ -583,7 +583,7 @@ export const UserManagementView: React.FC = () => {
               <div className="flex items-center gap-2">
                 <Info className="w-4 h-4 text-blue-600 shrink-0" />
                 <span>
-                  Kata sandi default setelah reset adalah <code className="font-mono bg-white px-1.5 py-0.5 rounded border border-slate-200 text-slate-800">PLN@2026</code>. Pengguna wajib menggantinya saat pertama kali masuk.
+                  Kata sandi default setelah reset adalah <code className="bg-white px-1.5 py-0.5 rounded border border-slate-200 text-slate-800 font-semibold">PLN@2026</code>. Pengguna wajib menggantinya saat pertama kali masuk.
                 </span>
               </div>
               <span className="font-semibold text-slate-700 shrink-0">
@@ -758,7 +758,7 @@ export const UserManagementView: React.FC = () => {
                   <div key={log.log_id} className="p-3.5 rounded-xl border border-slate-200 bg-slate-50/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <span className="font-mono text-[10px] font-bold bg-white px-2 py-0.5 rounded border border-slate-200 text-blue-700">
+                        <span className="text-[10px] font-bold bg-white px-2 py-0.5 rounded border border-slate-200 text-blue-700">
                           {log.log_id}
                         </span>
                         <span className="font-bold text-slate-900">{log.aksi}</span>
@@ -769,7 +769,7 @@ export const UserManagementView: React.FC = () => {
                       <div className="text-slate-500 text-[11px] flex items-center gap-2">
                         <span>Aktor: <strong>{log.aktor_sistem}</strong></span>
                         <span>•</span>
-                        <span>Korelasi: <code className="font-mono text-slate-600">{log.correlation_id}</code></span>
+                        <span>Korelasi: <code className="text-slate-600 font-medium">{log.correlation_id}</code></span>
                       </div>
                     </div>
 
@@ -882,7 +882,7 @@ export const UserManagementView: React.FC = () => {
 
               <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/80 text-xs text-slate-500 flex items-center gap-2">
                 <KeyRound className="w-4 h-4 text-slate-400 shrink-0" />
-                <span>Kata sandi bawaan pertama kali: <strong className="font-mono text-slate-800">password123</strong></span>
+                <span>Kata sandi bawaan pertama kali: <strong className="text-slate-800 font-semibold">password123</strong></span>
               </div>
 
               <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
@@ -1028,7 +1028,7 @@ export const UserManagementView: React.FC = () => {
             <div className="text-center space-y-1">
               <h3 className="font-bold text-slate-900 text-base">Hapus Pengguna?</h3>
               <p className="text-xs text-slate-500">
-                Apakah Anda yakin ingin menghapus akun <strong>{deleteTargetUser.nama_lengkap}</strong> (<span className="font-mono">{deleteTargetUser.username}</span>)? Tindakan ini akan dicatat dalam audit log sistem.
+                Apakah Anda yakin ingin menghapus akun <strong>{deleteTargetUser.nama_lengkap}</strong> (<span className="font-semibold text-slate-700">{deleteTargetUser.username}</span>)? Tindakan ini akan dicatat dalam audit log sistem.
               </p>
             </div>
 

@@ -25,12 +25,12 @@ const MainLayout: React.FC = () => {
   }
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-[#f4f7fb] text-slate-900 font-sans">
+    <div className="flex h-screen w-screen overflow-hidden bg-[#f4f7fb] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors duration-200">
       {/* Sidebar with toggle */}
       {sidebarOpen && <Sidebar />}
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
+      <div className="flex-1 flex flex-col min-w-0 overflow-y-auto bg-[#f4f7fb] dark:bg-slate-950 transition-colors">
         <Header onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
         
         <main className="flex-1 p-6 lg:p-8">
@@ -52,11 +52,11 @@ const MainLayout: React.FC = () => {
 
 
         {/* Footer matching reference image */}
-        <footer className="px-8 py-5 border-t border-slate-200/70 text-xs text-slate-400 flex flex-wrap items-center justify-between gap-2 no-print bg-white/50">
+        <footer className="px-8 py-5 border-t border-slate-200/70 dark:border-slate-800 text-xs text-slate-400 dark:text-slate-500 flex flex-wrap items-center justify-between gap-2 no-print bg-white/50 dark:bg-slate-900/50">
           <div className="font-medium">
             SIA PPOB PLN • Prototipe tugas kelompok
           </div>
-          <div className="font-medium text-slate-400">
+          <div className="font-medium text-slate-400 dark:text-slate-500">
             20 Okt 2026 • WIB
           </div>
         </footer>

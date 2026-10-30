@@ -127,7 +127,7 @@ export const JurnalLaporanView: React.FC = () => {
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-emerald-700 font-bold">{readyJournals.length} hasil COCOK final</span>
           <span>·</span>
-          <span className="text-sky-900 font-mono font-bold">{formatRupiah(totalReadyAmount)} siap posting</span>
+          <span className="text-sky-900 font-bold">{formatRupiah(totalReadyAmount)} siap posting</span>
           {blockedSettlements.length > 0 && (
             <>
               <span>·</span>
@@ -159,7 +159,7 @@ export const JurnalLaporanView: React.FC = () => {
           <button
             key={j.jurnal_id}
             onClick={() => setActiveJurnalIndex(idx)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-mono font-semibold transition-colors shrink-0 ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors shrink-0 ${
               activeJurnalIndex === idx
                 ? 'bg-sky-600 text-white shadow-xs'
                 : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'
@@ -186,7 +186,7 @@ export const JurnalLaporanView: React.FC = () => {
               </p>
             </div>
 
-            <div className="text-xs font-mono px-2.5 py-1 rounded bg-slate-100 text-slate-700 font-semibold">
+            <div className="text-xs px-2.5 py-1 rounded bg-slate-100 text-slate-700 font-semibold">
               Keseimbangan: Dr = Cr
             </div>
           </div>
@@ -195,7 +195,7 @@ export const JurnalLaporanView: React.FC = () => {
             <table className="w-full text-left text-sm">
               <thead className="bg-[#0e2a47] text-white text-xs uppercase font-semibold">
                 <tr>
-                  <th className="px-6 py-3 w-32 font-mono">Kode akun*</th>
+                  <th className="px-6 py-3 w-32 font-bold">Kode akun*</th>
                   <th className="px-6 py-3">Nama akun</th>
                   <th className="px-6 py-3 text-right w-44">Debit (Rp)</th>
                   <th className="px-6 py-3 text-right w-44">Kredit (Rp)</th>
@@ -204,16 +204,16 @@ export const JurnalLaporanView: React.FC = () => {
               <tbody className="divide-y divide-slate-200 text-xs">
                 {currentPreviewJurnal.detail.map((baris) => (
                   <tr key={baris.baris_id} className="hover:bg-slate-50">
-                    <td className="px-6 py-3.5 font-mono font-semibold text-sky-800">
+                    <td className="px-6 py-3.5 font-bold text-sky-800">
                       {baris.kode_akun}
                     </td>
                     <td className="px-6 py-3.5 text-slate-900 font-medium">
                       {baris.nama_akun}
                     </td>
-                    <td className="px-6 py-3.5 text-right font-mono font-semibold text-slate-900">
+                    <td className="px-6 py-3.5 text-right font-semibold text-slate-900">
                       {baris.debit > 0 ? formatNumber(baris.debit) : '0'}
                     </td>
-                    <td className="px-6 py-3.5 text-right font-mono font-semibold text-slate-900">
+                    <td className="px-6 py-3.5 text-right font-semibold text-slate-900">
                       {baris.kredit > 0 ? formatNumber(baris.kredit) : '0'}
                     </td>
                   </tr>
@@ -224,10 +224,10 @@ export const JurnalLaporanView: React.FC = () => {
                   <td colSpan={2} className="px-6 py-3 uppercase tracking-wider text-slate-800">
                     TOTAL
                   </td>
-                  <td className="px-6 py-3 text-right font-mono text-slate-900 text-sm">
+                  <td className="px-6 py-3 text-right font-bold text-slate-900 text-sm">
                     {formatNumber(currentPreviewJurnal.total_debit)}
                   </td>
-                  <td className="px-6 py-3 text-right font-mono text-slate-900 text-sm">
+                  <td className="px-6 py-3 text-right font-bold text-slate-900 text-sm">
                     {formatNumber(currentPreviewJurnal.total_kredit)}
                   </td>
                 </tr>

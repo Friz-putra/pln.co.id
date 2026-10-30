@@ -199,13 +199,13 @@ export const PelangganPortalView: React.FC = () => {
               </div>
               <div className="flex justify-between text-slate-600">
                 <span>Biaya Admin Kanal:</span>
-                <span className="font-mono font-semibold text-slate-800">
+                <span className="font-semibold text-slate-800">
                   {formatRupiah(adminKanal)}
                 </span>
               </div>
               <div className="pt-2 border-t border-slate-200 flex justify-between font-bold text-slate-900">
                 <span>Total Biaya:</span>
-                <span className="font-mono text-blue-700 font-bold">
+                <span className="text-blue-700 font-bold">
                   {formatRupiah(totalBayar)}
                 </span>
               </div>
@@ -237,7 +237,7 @@ export const PelangganPortalView: React.FC = () => {
                 <div className="p-3 bg-blue-50/60 rounded-xl border border-blue-100 text-xs space-y-1">
                   <div className="text-[11px] text-slate-500 font-medium">Nomor VA ({activePaymentBank}):</div>
                   <div className="flex items-center justify-between">
-                    <span className="font-mono font-extrabold text-blue-900 text-sm">
+                    <span className="font-extrabold text-blue-900 text-sm">
                       {virtualAccountNo}
                     </span>
                     <button
@@ -397,16 +397,16 @@ export const PelangganPortalView: React.FC = () => {
                   <tbody className="divide-y divide-slate-100">
                     {customerPayments.map(p => (
                       <tr key={p.pembayaran_id} className="hover:bg-slate-50">
-                        <td className="px-4 py-3 font-mono font-bold text-blue-700">
+                        <td className="px-4 py-3 font-bold text-blue-700">
                           {p.pembayaran_id}
                         </td>
                         <td className="px-4 py-3 font-semibold text-slate-800">
                           {p.periode_tagihan}
                         </td>
-                        <td className="px-4 py-3 text-slate-500 font-mono text-[11px]">
+                        <td className="px-4 py-3 text-slate-500 text-[11px]">
                           {p.waktu_bayar}
                         </td>
-                        <td className="px-4 py-3 text-right font-mono font-bold text-slate-900">
+                        <td className="px-4 py-3 text-right font-bold text-slate-900">
                           {formatRupiah(p.nominal_pln + p.admin)}
                         </td>
                         <td className="px-4 py-3 text-center">

@@ -209,10 +209,10 @@ export const AuditLogView: React.FC = () => {
                     <tr key={log.log_id} className="hover:bg-slate-50/70 transition-colors group">
                       {/* Waktu & ID */}
                       <td className="px-5 py-3.5 align-top">
-                        <div className="font-mono font-bold text-blue-700">
+                        <div className="font-bold text-blue-700">
                           {log.log_id}
                         </div>
-                        <div className="flex items-center gap-1 text-[11px] text-slate-400 mt-0.5 font-mono">
+                        <div className="flex items-center gap-1 text-[11px] text-slate-400 mt-0.5">
                           <Clock className="w-3 h-3 text-slate-400 shrink-0" />
                           <span>{log.waktu}</span>
                         </div>
@@ -232,7 +232,7 @@ export const AuditLogView: React.FC = () => {
 
                       {/* Entitas & Ref */}
                       <td className="px-5 py-3.5 align-top">
-                        <div className="font-mono font-bold text-slate-800">
+                        <div className="font-bold text-slate-800">
                           {log.entitas_id}
                         </div>
                         <div className="text-[11px] text-slate-400 mt-0.5">
@@ -256,7 +256,7 @@ export const AuditLogView: React.FC = () => {
                       </td>
 
                       {/* Correlation ID */}
-                      <td className="px-5 py-3.5 align-top text-right font-mono text-[11px] text-slate-400">
+                      <td className="px-5 py-3.5 align-top text-right text-[11px] text-slate-400">
                         {log.correlation_id}
                       </td>
                     </tr>
@@ -276,7 +276,7 @@ export const AuditLogView: React.FC = () => {
         {/* Footer Summary Bar */}
         <div className="px-6 py-3.5 bg-slate-50/70 border-t border-slate-200 text-xs font-semibold text-slate-600 flex items-center justify-between">
           <div>
-            Menampilkan <strong className="text-slate-900 font-mono">{filteredLogs.length}</strong> catatan log audit append-only
+            Menampilkan <strong className="text-slate-900 font-bold">{filteredLogs.length}</strong> catatan log audit append-only
           </div>
           <div className="text-[11px] text-slate-400">
             Jaminan Integritas: Log tidak dapat dimanipulasi atau dihapus

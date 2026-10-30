@@ -88,6 +88,10 @@ interface PPOBContextType {
   hasPermission: (permissionKey: string, role?: UserRole, userId?: string) => boolean;
 
 
+  // Theme
+  isDarkMode: boolean;
+  toggleDarkMode: () => void;
+
   // Actions
   findPelangganWithTagihan: (nomor: string) => { pelanggan?: Pelanggan; tagihan?: Tagihan } | null;
   processPayment: (params: {
@@ -117,8 +121,43 @@ export const PPOBProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [selectedPelangganId, setSelectedPelangganId] = useState<string>('PEL-003');
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
+  // Dark Mode Theme State
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem('sia_ppob_theme');
+      if (saved) return saved === 'dark';
+      return typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    } catch {
+      return false;
+    }
+  });
+
+  useEffect(() => {
+    try {
+      if (isDarkMode) {
+        document.documentElement.classList.add('dark');
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem('sia_ppob_theme', 'dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.setAttribute('data-theme', 'light');
+        localStorage.setItem('sia_ppob_theme', 'light');
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }, [isDarkMode]);
+
+  const toggleDarkMode = () => {
+    setIsDarkMode(prev => !prev);
+  };
+
   const setCurrentRole = (role: UserRole) => {
     setCurrentRoleState(role);
+    const matchedUser = users.find(u => u.role === role);
+    if (matchedUser) {
+      setActiveUsername(matchedUser.username);
+    }
     if (role === 'PELANGGAN') {
       setActivePage('portal_pelanggan');
     } else if (activePage === 'portal_pelanggan') {
@@ -126,7 +165,7 @@ export const PPOBProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const [activeUsername, setActiveUsername] = useState<string>('keuangan');
+  const [activeUsername, setActiveUsername] = useState<string>('petugas');
 
   // Core state collections
   const [banks] = useState<Bank[]>(INITIAL_BANKS);
@@ -145,19 +184,31 @@ export const PPOBProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [rolePermissions, setRolePermissions] = useState<Record<UserRole, Record<string, boolean>>>(INITIAL_ROLE_PERMISSIONS);
   const permissionItems = PERMISSION_ITEMS;
 
-  const currentUser = users.find(u => u.username === activeUsername) || users.find(u => u.role === currentRole) || users[0];
+  const currentUser = users.find(u => u.username === activeUsername && u.role === currentRole) ||
+                      users.find(u => u.role === currentRole) ||
+                      users.find(u => u.username === activeUsername) ||
+                      users[0];
 
   const login = (role?: UserRole, username?: string) => {
     setIsAuthenticated(true);
-    if (username) {
-      setActiveUsername(username);
+    const cleanUsername = username?.toLowerCase().trim();
+    let matchedUser = users.find(u => 
+      u.username.toLowerCase() === cleanUsername || 
+      u.nama_lengkap.toLowerCase() === cleanUsername
+    );
+    if (role && !matchedUser) {
+      matchedUser = users.find(u => u.role === role);
     }
-    if (role) {
-      setCurrentRole(role);
-      const match = users.find(u => u.role === role);
-      if (match && !username) {
-        setActiveUsername(match.username);
+    if (matchedUser) {
+      setActiveUsername(matchedUser.username);
+      setCurrentRoleState(matchedUser.role);
+      if (matchedUser.role === 'PELANGGAN') {
+        setActivePage('portal_pelanggan');
+      } else {
+        setActivePage('dashboard');
       }
+    } else if (role) {
+      setCurrentRole(role);
     }
   };
 
@@ -179,7 +230,22 @@ export const PPOBProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (parsed.kasusSelisihList) setKasusSelisihList(parsed.kasusSelisihList);
         if (parsed.jurnalList) setJurnalList(parsed.jurnalList);
         if (parsed.auditLogs) setAuditLogs(parsed.auditLogs);
-        if (parsed.users) setUsers(parsed.users);
+        if (parsed.users) {
+          // Guarantee canonical user names requested by user
+          const canonicalMap: Record<UserRole, string> = {
+            PETUGAS_PPOB: 'Ivan',
+            KEUANGAN_DISTRIBUSI: 'Valda',
+            SUPERVISOR: 'Khurin',
+            AKUNTANSI_UPJ: 'Levina',
+            PELANGGAN: 'Friz',
+            ADMIN: 'Admin'
+          };
+          const mappedUsers = (parsed.users as AppUser[]).map(u => ({
+            ...u,
+            nama_lengkap: canonicalMap[u.role] || u.nama_lengkap
+          }));
+          setUsers(mappedUsers);
+        }
         if (parsed.rolePermissions) setRolePermissions(parsed.rolePermissions);
       }
     } catch {
@@ -933,7 +999,9 @@ export const PPOBProvider: React.FC<{ children: React.ReactNode }> = ({ children
         completeDiscrepancyTransfer,
         updateKasusProposal,
         postJournals,
-        resetDataToDefault
+        resetDataToDefault,
+        isDarkMode,
+        toggleDarkMode
       }}
     >
       {children}
